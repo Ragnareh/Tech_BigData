@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <groupId>com.veridion.bigdata</groupId>
+    <artifactId>bigdata</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <encoding>UTF-8</encoding>
+        <spark.version>3.3.0</spark.version>
+        <scala.version>2.12</scala.version>
+        <scala.full.version>2.12.14</scala.full.version>
+        <scalatest.version>3.2.2</scalatest.version>
+        <flexmark.version>0.36.8</flexmark.version>
+        <circe.version>0.11.1</circe.version>
+        <scala-maven.plugin.version>4.7.2</scala-maven.plugin.version>
+        <scalatest-maven.plugin.version>2.1.0</scalatest-maven.plugin.version>
+        <sonar.junit.reportPaths>${project.basedir}/target/scalatest-reports</sonar.junit.reportPaths>
+        <sonar.scala.scalastyle.reportPaths>${project.basedir}/target/scalastyle-output.xml</sonar.scala.scalastyle.reportPaths>
+        <sonar.scala.scapegoat.reportPaths>${project.basedir}/target/scapegoat/scapegoat-scalastyle.xml</sonar.scala.scapegoat.reportPaths>
+        <sonar.scala.coverage.reportPaths>${project.basedir}/target/scoverage.xml</sonar.scala.coverage.reportPaths>
+    </properties>
+    <dependencies>
+
+        <!--SCALA-->
+        <dependency>
+            <artifactId>scala-library</artifactId>
+            <groupId>org.scala-lang</groupId>
+            <version>${scala.full.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-reflect</artifactId>
+            <version>${scala.full.version}</version>
+        </dependency>
+
+        <!--SPARK-->
+        <dependency> <!-- Spark SQL -->
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_${scala.version}</artifactId>
+            <version>${spark.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.beachape</groupId>
+            <artifactId>enumeratum-circe_${scala.version}</artifactId>
+            <version>1.5.22</version>
+        </dependency>
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-core_${scala.version}</artifactId>
+            <version>${circe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-generic-extras_${scala.version}</artifactId>
+            <version>${circe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-generic_${scala.version}</artifactId>
+            <version>${circe.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-parser_${scala.version}</artifactId>
+            <version>${circe.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.scopt/scopt -->
+        <dependency>
+            <groupId>com.github.scopt</groupId>
+            <artifactId>scopt_${scala.version}</artifactId>
+            <version>3.7.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/me.xdrop/fuzzywuzzy -->
+        <dependency>
+            <groupId>me.xdrop</groupId>
+            <artifactId>fuzzywuzzy</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+
+
+
+
+        <!--TESTING-->
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_${scala.version}</artifactId>
+            <version>${scalatest.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${basedir}/src/main/scala</sourceDirectory>
+        <finalName>bigdata</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.9.0</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>${scala-maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration combine.self="override">
+                    <scalaVersion>${scala.full.version}</scalaVersion>
+                    <args>
+                        <arg>-P:linter:disable:MergeMaps</arg>
+                        <!--<arg>-P:linter:disable:MergeMaps+JavaConverters+PreferIfToBooleanMatch</arg>-->
+                        <arg>-deprecation</arg><!-- Emit warning and location for usages of deprecated APIs-->
+                        <arg>-explaintypes</arg><!-- Explain type errors in more detail-->
+                        <arg>-feature</arg><!-- Emit warning and location for usages of features that should be imported explicitly-->
+                        <arg>-language:existentials</arg><!-- Existential types (besides wildcard types) can be written and inferred-->
+                        <arg>-language:experimental.macros</arg><!-- Allow macro definition (besides implementation and application)-->
+                        <arg>-language:higherKinds</arg><!-- Allow higher-kinded types-->
+                        <arg>-language:implicitConversions</arg><!-- Allow definition of implicit functions called views-->
+                        <arg>-unchecked</arg><!-- Enable additional warnings where generated code depends on assumptions-->
+                        <arg>-Xcheckinit</arg><!-- Wrap field accessors to throw an exception on uninitialized access-->
+                        <arg>-Xfatal-warnings</arg><!-- Fail the compilation if there are any warnings-->
+                        <arg>-Xfuture</arg><!-- Turn on future language features-->
+                        <!--<arg>-Xlint:adapted-args</arg>   --><!-- Warn if an argument list is modified to match the receiver-->
+                        <arg>-Xlint:by-name-right-associative</arg><!-- By-name parameter of right associative operator-->
+                        <arg>-Xlint:delayedinit-select</arg><!-- Selecting member of DelayedInit-->
+                        <arg>-Xlint:doc-detached</arg><!-- A Scaladoc comment appears to be detached from its element-->
+                        <arg>-Xlint:inaccessible</arg><!-- Warn about inaccessible types in method signatures-->
+                        <arg>-Xlint:infer-any</arg><!-- Warn when a type argument is inferred to be `Any`-->
+                        <arg>-Xlint:missing-interpolator</arg><!-- A string literal appears to be missing an interpolator id-->
+                        <arg>-Xlint:nullary-override</arg><!-- Warn when non-nullary `def f()' overrides nullary `def f'-->
+                        <arg>-Xlint:nullary-unit</arg><!-- Warn when nullary methods return Unit-->
+                        <arg>-Xlint:option-implicit</arg><!-- Option apply used implicit view-->
+                        <arg>-Xlint:package-object-classes</arg><!-- Class or object defined in package object-->
+                        <arg>-Xlint:poly-implicit-overload</arg><!-- Parameterized overloaded implicit methods are not visible as view bounds-->
+                        <arg>-Xlint:private-shadow</arg><!-- A private field (or class parameter) shadows a superclass field-->
+                        <arg>-Xlint:stars-align</arg><!-- Pattern sequence wildcard must align with sequence component-->
+                        <arg>-Xlint:type-parameter-shadow</arg><!-- A local type parameter shadows a type already in scope-->
+                        <arg>-Xlint:unsound-match</arg><!-- Pattern match may not be typesafe-->
+                        <!--<arg>-Yno-adapted-args</arg>--><!-- Do not adapt an argument list (either by inserting () or creating a tuple) to match the receiver-->
+                        <arg>-Ypartial-unification</arg><!-- Enable partial unification in type constructor inference -->
+                        <arg>-Ywarn-dead-code</arg><!-- Warn when dead code is identified-->
+                        <arg>-Ywarn-inaccessible</arg><!-- Warn about inaccessible types in method signatures-->
+                        <arg>-Ywarn-infer-any</arg><!-- Warn when a type argument is inferred to be `Any`-->
+                        <arg>-Ywarn-nullary-override</arg><!-- Warn when non-nullary `def f()' overrides nullary `def f'-->
+                        <arg>-Ywarn-nullary-unit</arg><!-- Warn when nullary methods return Unit-->
+                        <arg>-Ywarn-numeric-widen</arg><!-- Warn when numerics are widened-->
+                        <arg>-Ywarn-value-discard</arg><!-- Warn when non-Unit expression results are unused-->
+                        <arg>-Ywarn-unused</arg>
+                        <arg>-Ywarn-unused-import</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.AnyVal</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.AsInstanceOf</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.EitherProjectionPartial</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.Enumeration</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.ExplicitImplicitTypes</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.FinalVal</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.IsInstanceOf</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.LeakingSealed</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.MutableDataStructures</arg>
+                        <!--<arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.Null</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.OptionPartial</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.TraversableOps</arg>-->
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.PublicInference</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.Recursion</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.Return</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.StringPlusAny</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.TryPartial</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.Var</arg>
+                        <arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.While</arg>
+                        <arg>-P:wartremover:excluded:com.deloitte.dataprep.UdfTest</arg>
+                        <arg>-P:wartremover:excluded:com.deloitte.dataprep.ContextTest</arg>
+                        <arg>-P:wartremover:excluded:com.deloitte.dataprep.DataFrameUtilsTest</arg>
+                        <arg>-P:wartremover:excluded:com.deloitte.dataprep.PreparationMatchers</arg>
+                        <arg>-P:wartremover:excluded:com.deloitte.dataprep.RecipeHandlerTest</arg>
+                        <arg>-P:wartremover:excluded:com.deloitte.dataprep.UdfTest</arg>
+                        <arg>-P:wartremover:excluded:com.deloitte.dataprep.DecodeJsonTest</arg>
+                    </args>
+                    <compilerPlugins>
+                        <compilerPlugin>
+                            <groupId>org.wartremover</groupId>
+                            <artifactId>wartremover_${scala.full.version}</artifactId>
+                            <version>3.0.6</version>
+                        </compilerPlugin>
+                        <compilerPlugin>
+                            <groupId>org.psywerx.hairyfotr</groupId>
+                            <artifactId>linter_${scala.version}</artifactId>
+                            <version>0.1.17</version>
+                        </compilerPlugin>
+                    </compilerPlugins>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <!-- enable scalatest -->
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <version>${scalatest-maven.plugin.version}</version>
+                <configuration>
+                    <reportsDirectory>${project.build.directory}/scalatest-reports</reportsDirectory>
+                    <filereports>${project.name}_TestSuite.txt</filereports>
+                    <parallel>false</parallel>
+                    <forkMode>never</forkMode>
+                    <runpath>${project.basedir}/../Common/common-utils/target/scoverage-classes</runpath>
+                    <htmlreporters>${project.build.directory}/html/scalatest</htmlreporters>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
